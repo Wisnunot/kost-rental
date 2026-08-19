@@ -1,0 +1,17 @@
+node_modules/
+vendor/
+.env
+*.log
+_ck_*
+_cek_*
+_test_*
+test_*.php
+_test_*.php
+/Dockerfile
+docker-compose.yml
+README*.md
+database.sql
+database_alter_pemesanan_status.sql
+
+# Uploads: di Railway dipakai volume persisten (lihat README_DEPLOY.md)
+uploads/
