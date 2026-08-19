@@ -9,6 +9,7 @@ if (!isset($_SESSION['user_id'])) {
 }
 
 require_once '../config/database.php';
+require_once '../config/Storage.php';
 
 if (!isset($_GET['id'])) {
     header("Location: list_kost.php");
@@ -59,7 +60,7 @@ if (!empty($kost['user_id'])) {
         <!-- Hero image (utama) -->
         <?php if (!empty($kost['gambar'])): ?>
             <div class="detail-image-wrapper">
-                <img src="../uploads/kost/<?php echo htmlspecialchars($kost['gambar']); ?>" alt="<?php echo htmlspecialchars($kost['nama']); ?>" class="detail-image">
+                <img src="<?php echo Storage::url('kost', $kost['gambar']); ?>" alt="<?php echo htmlspecialchars($kost['nama']); ?>" class="detail-image">
             </div>
         <?php endif; ?>
 
@@ -82,7 +83,7 @@ if (!empty($kost['user_id'])) {
             <div class="gallery-grid">
                 <?php foreach ($semuaFoto as $i => $f): ?>
                     <?php if ($i === 0) continue; // foto utama sudah tampil di hero ?>
-                    <img src="../uploads/kost/<?php echo htmlspecialchars($f); ?>" alt="Foto galeri <?php echo $i; ?>">
+                    <img src="<?php echo Storage::url('kost', $f); ?>" alt="Foto galeri <?php echo $i; ?>">
                 <?php endforeach; ?>
             </div>
         <?php endif; ?>

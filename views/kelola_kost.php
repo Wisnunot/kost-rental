@@ -9,6 +9,7 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'ibu_kost') {
 }
 
 require_once '../config/database.php';
+require_once '../config/Storage.php';
 
 $user_id = $_SESSION['user_id'];
 
@@ -30,14 +31,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['hapus_id'])) {
     $stmt = $conn->prepare("DELETE FROM kost WHERE id = ? AND user_id = ?");
     $stmt->execute([$id, $user_id]);
     if ($stmt->rowCount() > 0) {
-        // Hapus file gambar utama
-        if ($row && !empty($row['gambar']) && file_exists('../uploads/kost/' . $row['gambar'])) {
-            unlink('../uploads/kost/' . $row['gambar']);
+        // Hapus file gambar utama di storage
+        if ($row && !empty($row['gambar'])) {
+            Storage::delete('kost', $row['gambar']);
         }
         // Hapus file galeri (kost_gambar kehapus otomatis via ON DELETE CASCADE)
         foreach ($galeriFiles as $g) {
-            if (!empty($g['file']) && file_exists('../uploads/kost/' . $g['file'])) {
-                unlink('../uploads/kost/' . $g['file']);
+            if (!empty($g['file'])) {
+                Storage::delete('kost', $g['file']);
             }
         }
         $_SESSION['success'] = 'Kost berhasil dihapus.';

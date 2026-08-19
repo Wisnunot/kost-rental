@@ -9,6 +9,7 @@ if (!isset($_SESSION['user_id'])) {
 }
 
 require_once '../config/database.php';
+require_once '../config/Storage.php';
 $user_id = $_SESSION['user_id'];
 
 // --- Update profil ---
@@ -71,21 +72,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['upload_foto'])) {
         $finfo = new finfo(FILEINFO_MIME_TYPE);
         $mime  = $finfo->file($_FILES['foto']['tmp_name']);
         if (in_array($mime, ['image/jpeg', 'image/png', 'image/webp'], true)) {
-            if (!is_dir('../uploads/profil')) {
-                mkdir('../uploads/profil', 0777, true);
-            }
             $ext = ['image/jpeg' => 'jpg', 'image/png' => 'png', 'image/webp' => 'webp'][$mime];
             $namaFile = time() . '_' . uniqid() . '.' . $ext;
 
-            // Hapus foto lama (kalau ada dan bukan default)
+            // Hapus foto lama dari storage (kalau ada dan bukan default)
             $oldStmt = $conn->prepare("SELECT foto FROM users WHERE id = ?");
             $oldStmt->execute([$user_id]);
             $oldFoto = $oldStmt->fetch()['foto'] ?? '';
-            if (!empty($oldFoto) && file_exists('../uploads/profil/' . $oldFoto)) {
-                unlink('../uploads/profil/' . $oldFoto);
+            if (!empty($oldFoto)) {
+                Storage::delete('profil', $oldFoto);
             }
 
-            if (move_uploaded_file($_FILES['foto']['tmp_name'], '../uploads/profil/' . $namaFile)) {
+            if (Storage::upload('profil', $namaFile, $_FILES['foto']['tmp_name'], $mime)) {
                 $up = $conn->prepare("UPDATE users SET foto = ? WHERE id = ?");
                 $up->execute([$namaFile, $user_id]);
                 $_SESSION['foto'] = $namaFile;
@@ -119,7 +117,7 @@ $profil = $stmt->fetch();
         <h3>Foto Profil</h3>
         <div style="display:flex; align-items:center; gap:16px; margin-bottom:16px;">
             <?php if (!empty($profil['foto'])): ?>
-                <img src="../uploads/profil/<?php echo htmlspecialchars($profil['foto']); ?>" alt="Foto profil" style="width:80px; height:80px; border-radius:50%; object-fit:cover;">
+                <img src="<?php echo Storage::url('profil', $profil['foto']); ?>" alt="Foto profil" style="width:80px; height:80px; border-radius:50%; object-fit:cover;">
             <?php else: ?>
                 <div style="width:80px; height:80px; border-radius:50%; background:#e2e8f0; display:flex; align-items:center; justify-content:center; font-size:32px;">👤</div>
             <?php endif; ?>

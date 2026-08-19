@@ -161,7 +161,7 @@ $daftarFasilitas = ['WiFi', 'AC', 'Kamar Mandi Dalam', 'Parkir Motor', 'Listrik'
         <div class="kost-card">
             <div class="card-img" style="<?php echo !empty($kost['gambar']) ? '' : "background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);"; ?>">
                 <?php if (!empty($kost['gambar'])): ?>
-                    <img src="../uploads/kost/<?php echo htmlspecialchars($kost['gambar']); ?>" alt="<?php echo htmlspecialchars($kost['nama']); ?>" class="card-img-real">
+                    <img src="<?php echo Storage::url('kost', $kost['gambar']); ?>" alt="<?php echo htmlspecialchars($kost['nama']); ?>" class="card-img-real">
                 <?php else: ?>
                     <span>🏠</span>
                 <?php endif; ?>

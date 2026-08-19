@@ -6,6 +6,7 @@ session_start();
 $page_title = "Cari Kost Terdekat";
 $base_url = "assets/css/";
 include 'views/header.php';
+require_once 'config/Storage.php';
 
 // Koneksi buat ambil data kost
 require_once 'config/database.php';
@@ -48,7 +49,7 @@ $kosts = $result ? $result->fetchAll() : [];
                     <div class="kost-card">
                         <div class="card-img" style="<?php echo !empty($kost['gambar']) ? '' : "background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);"; ?>">
                             <?php if (!empty($kost['gambar'])): ?>
-                                <img src="uploads/kost/<?php echo htmlspecialchars($kost['gambar']); ?>" alt="<?php echo htmlspecialchars($kost['nama']); ?>" class="card-img-real">
+                                <img src="<?php echo Storage::url('kost', $kost['gambar']); ?>" alt="<?php echo htmlspecialchars($kost['nama']); ?>" class="card-img-real">
                             <?php else: ?>
                                 <span><?php
                                     $icons = ['🏠', '🏘️', '🏡', '🌆', '🏙️', '🌇'];

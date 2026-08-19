@@ -6,6 +6,7 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 require_once __DIR__ . '/../config/csrf.php'; // token helper tersedia di semua halaman
+require_once __DIR__ . '/../config/Storage.php';
 ?>
 <!DOCTYPE html>
 <html lang="id">
@@ -38,7 +39,7 @@ require_once __DIR__ . '/../config/csrf.php'; // token helper tersedia di semua 
         </div>
         <div class="nav-right">
             <?php if (!empty($_SESSION['foto'])): ?>
-                <img src="uploads/profil/<?php echo htmlspecialchars($_SESSION['foto']); ?>" alt="Foto profil" class="nav-avatar">
+                <img src="<?php echo Storage::url('profil', $_SESSION['foto']); ?>" alt="Foto profil" class="nav-avatar">
             <?php endif; ?>
             <span class="user-info"><?php echo htmlspecialchars($_SESSION['nama'] ?? 'User'); ?></span>
             <form method="POST" action="logout.php" style="display:inline; margin-left:8px;">

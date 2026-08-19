@@ -9,6 +9,7 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'ibu_kost') {
 }
 
 require_once '../config/database.php';
+require_once '../config/Storage.php';
 
 // Proses tambah
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['simpan'])) {
@@ -31,7 +32,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['simpan'])) {
         $jenis = 'campur';
     }
 
-    // Helper validasi + simpan gambar
+    // Helper validasi + simpan gambar (via Supabase Storage)
     function simpan_gambar_kost(array $file, string $prefix): ?string {
         if ($file['error'] !== UPLOAD_ERR_OK) return null;
         if ($file['size'] > 2 * 1024 * 1024) return 'TOO_BIG';
@@ -40,7 +41,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['simpan'])) {
         $allowedMime = ['image/jpeg' => 'jpg', 'image/png' => 'png', 'image/webp' => 'webp'];
         if (!isset($allowedMime[$mime])) return 'BAD_TYPE';
         $namaFile = $prefix . time() . '_' . uniqid() . '.' . $allowedMime[$mime];
-        if (!move_uploaded_file($file['tmp_name'], '../uploads/kost/' . $namaFile)) return null;
+        if (!Storage::upload('kost', $namaFile, $file['tmp_name'], $mime)) return null;
         return $namaFile;
     }
 

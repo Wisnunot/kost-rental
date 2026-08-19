@@ -9,6 +9,7 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'ibu_kost') {
 }
 
 require_once '../config/database.php';
+require_once '../config/Storage.php';
 
 $user_id = $_SESSION['user_id'];
 
@@ -54,7 +55,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update'])) {
         $jenis = 'campur';
     }
 
-    // Helper validasi + simpan gambar
+    // Helper validasi + simpan gambar (via Supabase Storage)
     function simpan_gambar_kost_edit(array $file, string $prefix): ?string {
         if ($file['error'] !== UPLOAD_ERR_OK) return null;
         if ($file['size'] > 2 * 1024 * 1024) return 'TOO_BIG';
@@ -63,7 +64,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update'])) {
         $allowedMime = ['image/jpeg' => 'jpg', 'image/png' => 'png', 'image/webp' => 'webp'];
         if (!isset($allowedMime[$mime])) return 'BAD_TYPE';
         $namaFile = $prefix . time() . '_' . uniqid() . '.' . $allowedMime[$mime];
-        if (!move_uploaded_file($file['tmp_name'], '../uploads/kost/' . $namaFile)) return null;
+        if (!Storage::upload('kost', $namaFile, $file['tmp_name'], $mime)) return null;
         return $namaFile;
     }
 
@@ -79,9 +80,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update'])) {
             header("Location: edit_kost.php?id=$id");
             exit();
         } elseif ($res !== null) {
-            // Hapus gambar lama
-            if (!empty($kost['gambar']) && file_exists('../uploads/kost/' . $kost['gambar'])) {
-                unlink('../uploads/kost/' . $kost['gambar']);
+            // Hapus gambar lama di storage
+            if (!empty($kost['gambar'])) {
+                Storage::delete('kost', $kost['gambar']);
             }
             $gambar = $res;
         }
@@ -115,9 +116,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update'])) {
             $gs->execute([$gid, $id]);
             $rowG = $gs->fetch();
             if ($rowG) {
-                if (file_exists('../uploads/kost/' . $rowG['file'])) {
-                    unlink('../uploads/kost/' . $rowG['file']);
-                }
+                Storage::delete('kost', $rowG['file']);
                 $gd = $conn->prepare("DELETE FROM kost_gambar WHERE id = ? AND kost_id = ?");
                 $gd->execute([$gid, $id]);
             }
@@ -171,7 +170,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update'])) {
             <label for="gambar">Foto Kost (Utama)</label>
             <?php if (!empty($kost['gambar'])): ?>
                 <div style="margin-bottom:8px;">
-                    <img src="../uploads/kost/<?php echo htmlspecialchars($kost['gambar']); ?>" alt="Foto kost" style="width:160px;height:120px;object-fit:cover;border-radius:10px;">
+                    <img src="<?php echo Storage::url('kost', $kost['gambar']); ?>" alt="Foto kost" style="width:160px;height:120px;object-fit:cover;border-radius:10px;">
                     <br><small style="color:#64748b;">Foto saat ini. Upload di bawah untuk ganti.</small>
                 </div>
             <?php endif; ?>
@@ -185,7 +184,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update'])) {
             <div class="gallery-grid" style="margin-top:8px;">
                 <?php foreach ($galeri as $g): ?>
                 <label style="position:relative; cursor:pointer;">
-                    <img src="../uploads/kost/<?php echo htmlspecialchars($g['file']); ?>" alt="Foto galeri" style="width:100%; height:130px; object-fit:cover; border-radius:10px;">
+                    <img src="<?php echo Storage::url('kost', $g['file']); ?>" alt="Foto galeri" style="width:100%; height:130px; object-fit:cover; border-radius:10px;">
                     <input type="checkbox" name="hapus_galeri[]" value="<?php echo $g['id']; ?>" style="position:absolute; top:6px; left:6px; width:18px; height:18px; accent-color:#ef4444;">
                 </label>
                 <?php endforeach; ?>
