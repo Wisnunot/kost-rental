@@ -7,6 +7,18 @@ if (session_status() === PHP_SESSION_NONE) {
 }
 require_once __DIR__ . '/../config/csrf.php'; // token helper tersedia di semua halaman
 require_once __DIR__ . '/../config/Storage.php';
+
+// --- Notifikasi pemesanan (khusus pemilik kost) ---
+$notif_count = 0;
+$notif_list  = [];
+if (isset($_SESSION['user_id']) && ($_SESSION['role'] ?? '') === 'ibu_kost') {
+    require_once __DIR__ . '/../config/database.php';
+    require_once __DIR__ . '/../config/notifikasi.php';
+    $notif_count = hitung_notifikasi_baru($conn, (int)$_SESSION['user_id']);
+    if ($notif_count > 0) {
+        $notif_list = ambil_notifikasi_terbaru($conn, (int)$_SESSION['user_id']);
+    }
+}
 ?>
 <!DOCTYPE html>
 <html lang="id">
@@ -38,6 +50,33 @@ require_once __DIR__ . '/../config/Storage.php';
             <a href="profil.php" class="<?php echo basename($_SERVER['PHP_SELF']) === 'profil.php' ? 'active' : ''; ?>">Profil</a>
         </div>
         <div class="nav-right">
+            <?php if (($_SESSION['role'] ?? '') === 'ibu_kost'): ?>
+            <!-- 🔔 Notifikasi Pemesanan -->
+            <div class="notif-wrap" id="notifWrap">
+                <button type="button" class="notif-bell" id="notifBell" aria-label="Notifikasi pemesanan" title="Notifikasi pemesanan">
+                    🔔
+                    <span class="notif-badge" id="notifBadge"
+                          style="<?php echo $notif_count > 0 ? '' : 'display:none;'; ?>"><?php echo (int)$notif_count; ?></span>
+                </button>
+                <div class="notif-popup" id="notifPopup">
+                    <div class="notif-popup-head">Pemesanan Baru</div>
+                    <?php if ($notif_count > 0): ?>
+                        <?php foreach ($notif_list as $n): ?>
+                        <a href="daftar_pemesanan.php" class="notif-item">
+                            <strong><?php echo htmlspecialchars($n['penyewa']); ?></strong> memesan
+                            <em><?php echo htmlspecialchars($n['kost']); ?></em>
+                            <small><?php echo date('d M Y H:i', strtotime($n['created_at'])); ?></small>
+                        </a>
+                        <?php endforeach; ?>
+                        <?php if ($notif_count > count($notif_list)): ?>
+                        <a href="daftar_pemesanan.php" class="notif-more">+<?php echo $notif_count - count($notif_list); ?> pemesanan lainnya</a>
+                        <?php endif; ?>
+                    <?php else: ?>
+                        <div class="notif-empty">Tidak ada pemesanan baru ✨</div>
+                    <?php endif; ?>
+                </div>
+            </div>
+            <?php endif; ?>
             <?php if (!empty($_SESSION['foto'])): ?>
                 <img src="<?php echo Storage::url('profil', $_SESSION['foto']); ?>" alt="Foto profil" class="nav-avatar">
             <?php endif; ?>

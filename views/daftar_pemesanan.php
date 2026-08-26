@@ -12,6 +12,11 @@ require_once '../config/database.php';
 
 $user_id = $_SESSION['user_id'];
 
+// Pemilik membuka halaman ini = pemesanan dianggap SUDAH DIBACA
+// (bubble notifikasi di navbar otomatis hilang)
+require_once '../config/notifikasi.php';
+tandai_pemesanan_dibaca($conn, (int)$user_id);
+
 // Konfirmasi / Tolak — hanya via POST + CSRF
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'], $_POST['id'])) {
     csrf_verify('daftar_pemesanan.php');
