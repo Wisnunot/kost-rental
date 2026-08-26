@@ -105,6 +105,7 @@ if (!isset($_SESSION['user_id'])) {
             <h3 style="font-size:22px; font-weight:700; margin-bottom:20px;">🏆 Rekomendasi Kost</h3>
             <?php
             require_once '../config/database.php';
+            require_once '../config/Storage.php';
             $result = $conn->query("SELECT * FROM kost ORDER BY created_at DESC LIMIT 3");
             $kosts = $result ? $result->fetchAll() : [];
             if (count($kosts) > 0):
@@ -112,8 +113,12 @@ if (!isset($_SESSION['user_id'])) {
             <div class="kost-grid">
                 <?php foreach ($kosts as $kost): ?>
                 <div class="kost-card">
-                    <div class="card-img" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
-                        <span>🏠</span>
+                    <div class="card-img" style="<?php echo !empty($kost['gambar']) ? '' : "background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);"; ?>">
+                        <?php if (!empty($kost['gambar'])): ?>
+                            <img src="<?php echo Storage::url('kost', $kost['gambar']); ?>" alt="<?php echo htmlspecialchars($kost['nama']); ?>" class="card-img-real">
+                        <?php else: ?>
+                            <span>🏠</span>
+                        <?php endif; ?>
                         <span class="card-tag"><?php echo ucfirst($kost['jenis_kost']); ?></span>
                         <span class="card-price-tag">Rp <?php echo number_format($kost['harga'], 0, ',', '.'); ?>/bln</span>
                     </div>
