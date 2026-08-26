@@ -17,6 +17,12 @@ if (!isset($_SESSION['user_id'])) {
 
     <?php if ($_SESSION['role'] === 'ibu_kost'): ?>
         <!-- MENU IBU KOST -->
+        <?php
+        // Hitung pemesanan baru (belum dibaca) untuk badge di kartu
+        require_once '../config/database.php';
+        require_once '../config/notifikasi.php';
+        $notif_count = hitung_notifikasi_baru($conn, (int)$_SESSION['user_id']);
+        ?>
         <div class="dashboard-menu">
             <a href="tambah_kost.php" class="dashboard-card">
                 <div class="dash-icon">➕</div>
@@ -26,7 +32,10 @@ if (!isset($_SESSION['user_id'])) {
                 <div class="dash-icon">📋</div>
                 <h4>Kelola Kost</h4>
             </a>
-            <a href="daftar_pemesanan.php" class="dashboard-card">
+            <a href="daftar_pemesanan.php" class="dashboard-card" style="position:relative;">
+                <?php if ($notif_count > 0): ?>
+                <span class="dash-badge"><?php echo $notif_count > 99 ? '99+' : (int)$notif_count; ?></span>
+                <?php endif; ?>
                 <div class="dash-icon">📦</div>
                 <h4>Pemesanan Masuk</h4>
             </a>

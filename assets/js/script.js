@@ -53,35 +53,4 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
 
-    // === Notifikasi pemesanan (bell + popup) ===
-    const notifWrap  = document.getElementById('notifWrap');
-    const notifBell  = document.getElementById('notifBell');
-    const notifBadge = document.getElementById('notifBadge');
-
-    if (notifWrap && notifBell) {
-        notifBell.addEventListener('click', function (e) {
-            e.stopPropagation();
-            notifWrap.classList.toggle('open');
-        });
-
-        // Klik di luar popup -> tutup
-        document.addEventListener('click', function (e) {
-            if (!notifWrap.contains(e.target)) {
-                notifWrap.classList.remove('open');
-            }
-        });
-
-        // Tutup pakai tombol Escape
-        document.addEventListener('keydown', function (e) {
-            if (e.key === 'Escape') {
-                notifWrap.classList.remove('open');
-            }
-        });
-
-        // Kalau tidak ada notifikasi, badge tetap disembunyikan (double-guard)
-        if (notifBadge && notifBadge.textContent.trim() === '0') {
-            notifBadge.style.display = 'none';
-        }
-    }
-
 });

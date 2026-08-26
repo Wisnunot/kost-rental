@@ -200,125 +200,30 @@ img { max-width: 100%; height: auto; }
 }
 
 /* ===========================================
-   NOTIFIKASI PEMESANAN (bell + bubble + popup)
+   BADGE PEMESANAN BARU (kartu dashboard)
    =========================================== */
-.notif-wrap {
-    position: relative;
-    margin-right: 4px;
-}
-
-.notif-bell {
-    position: relative;
-    background: rgba(255,255,255,0.08);
-    border: none;
-    border-radius: 10px;
-    padding: 7px 11px;
-    font-size: 18px;
-    cursor: pointer;
-    line-height: 1;
-    transition: background 0.2s;
-}
-
-.notif-bell:hover {
-    background: rgba(255,255,255,0.16);
-}
-
-.notif-badge {
+.dash-badge {
     position: absolute;
-    top: -6px;
-    right: -6px;
-    min-width: 19px;
-    height: 19px;
-    padding: 0 5px;
+    top: -9px;
+    right: -9px;
+    min-width: 26px;
+    height: 26px;
+    padding: 0 8px;
     border-radius: 999px;
     background: #ef4444;
     color: #fff;
-    font-size: 11.5px;
+    font-size: 13.5px;
     font-weight: 700;
     display: flex;
     align-items: center;
     justify-content: center;
-    box-shadow: 0 2px 6px rgba(239,68,68,0.5);
-    animation: notif-pulse 1.8s ease-in-out infinite;
+    box-shadow: 0 3px 10px rgba(239,68,68,0.45);
+    animation: notif-pulse 1.6s ease-in-out infinite;
 }
 
 @keyframes notif-pulse {
     0%, 100% { transform: scale(1); }
-    50%      { transform: scale(1.15); }
-}
-
-.notif-popup {
-    display: none;
-    position: absolute;
-    top: calc(100% + 12px);
-    right: 0;
-    width: 320px;
-    max-width: 88vw;
-    background: #ffffff;
-    color: #1a1a2e;
-    border-radius: 14px;
-    box-shadow: 0 16px 45px rgba(0,0,0,0.28);
-    overflow: hidden;
-    z-index: 1001;
-}
-
-.notif-wrap.open .notif-popup {
-    display: block;
-    animation: notif-drop 0.22s ease-out;
-}
-
-@keyframes notif-drop {
-    from { opacity: 0; transform: translateY(-8px); }
-    to   { opacity: 1; transform: translateY(0); }
-}
-
-.notif-popup-head {
-    padding: 13px 16px;
-    font-size: 13px;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.4px;
-    color: #64748b;
-    background: #f8f9fa;
-    border-bottom: 1px solid #eef0f3;
-}
-
-.notif-item {
-    display: block;
-    padding: 12px 16px;
-    border-bottom: 1px solid #eef0f3;
-    font-size: 13.5px;
-    line-height: 1.45;
-    color: #1a1a2e;
-    transition: background 0.15s;
-}
-
-.notif-item:last-of-type { border-bottom: none; }
-
-.notif-item:hover { background: #fdf6e3; }
-
-.notif-item small {
-    display: block;
-    color: #94a3b8;
-    margin-top: 3px;
-    font-size: 12px;
-}
-
-.notif-more {
-    display: block;
-    text-align: center;
-    padding: 11px;
-    font-size: 13px;
-    font-weight: 600;
-    color: #b45309;
-    background: #fefaf0;
-}
-
-.notif-empty {
-    padding: 26px 16px;
-    text-align: center;
-    color: #94a3b8;
-    font-size: 13.5px;
+    50%      { transform: scale(1.12); }
 }
 
 
