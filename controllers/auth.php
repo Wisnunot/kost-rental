@@ -2,6 +2,7 @@
 // =============================================================
 // AUTH CONTROLLER — Login, Register, Logout logic (PDO + CSRF)
 // =============================================================
+require_once '../config/session.php';
 require_once '../config/csrf.php';
 require_once '../config/database.php';
 
@@ -53,6 +54,20 @@ if (isset($_POST['login'])) {
     $email    = trim($_POST['email']);
     $password = $_POST['password'];
 
+    // === Rate limit: maksimal 5 gagal per 10 menit per email+IP ===
+    $key        = 'login_fail_' . hash('sha256', strtolower($email) . '|' . ($_SERVER['REMOTE_ADDR'] ?? ''));
+    $now        = time();
+    $failData   = $_SESSION[$key] ?? ['count' => 0, 'first' => $now];
+    if (($now - $failData['first']) > 600) {
+        $failData = ['count' => 0, 'first' => $now]; // reset setelah 10 menit
+    }
+    if ($failData['count'] >= 5) {
+        $sisa = ceil((600 - ($now - $failData['first'])) / 60);
+        $_SESSION['error'] = "Terlalu banyak percobaan gagal. Coba lagi dalam {$sisa} menit.";
+        header('Location: ../views/login.php');
+        exit();
+    }
+
     if (empty($email) || empty($password)) {
         $_SESSION['error'] = 'Email dan password wajib diisi!';
         header('Location: ../views/login.php');
@@ -64,6 +79,7 @@ if (isset($_POST['login'])) {
     $user = $stmt->fetch();
 
     if ($user && password_verify($password, $user['password'])) {
+        unset($_SESSION[$key]); // sukses -> hapus hitungan gagal
         // Cegah session fixation: ganti ID session setelah login berhasil
         session_regenerate_id(true);
 
@@ -72,7 +88,9 @@ if (isset($_POST['login'])) {
         $_SESSION['role']    = $user['role'];
         header('Location: ../views/dashboard.php');
     } else {
-        $_SESSION['error'] = 'Email atau password salah!';
+        $failData['count']++;
+        $_SESSION[$key] = $failData;
+        $_SESSION['error'] = 'Email atau password salah! (percobaan gagal: ' . $failData['count'] . '/5)';
         header('Location: ../views/login.php');
     }
     exit();

@@ -2,7 +2,7 @@
 // =============================================================
 // LANDING PAGE — Inspired by Papikost
 // =============================================================
-session_start();
+require_once __DIR__ . '/config/session.php';
 $page_title = "Cari Kost Terdekat";
 $base_url = "assets/css/";
 include 'views/header.php';

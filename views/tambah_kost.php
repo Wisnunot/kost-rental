@@ -1,5 +1,5 @@
 <?php
-session_start();
+require_once '../config/session.php';
 $page_title = "Tambah Kost";
 include 'header.php';
 

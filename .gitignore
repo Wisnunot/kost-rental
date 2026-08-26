@@ -3,6 +3,7 @@ vendor/
 .env
 *.log
 _*.php
+_*.txt
 /Dockerfile
 docker-compose.yml
 README*.md
@@ -10,4 +11,4 @@ database.sql
 database_alter_pemesanan_status.sql
 
 # Uploads: kini pakai Supabase Storage (bucket kost & profil)
-uploads/
+uploads/.hermes-tmp*/
